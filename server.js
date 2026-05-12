@@ -71,8 +71,8 @@ io.on('connection', (socket) => {
 
     socket.on('hedefKilitlendi', (veri) => {
         if (sonBaglantiDurumu) {
-            console.log(`🎯 EMİR -> ${veri.isim} | X:${veri.x}, Y:${veri.y}, Z:${veri.z}`);
-            arduinoPort.write(`${veri.x},${veri.y},${veri.z}\n`, (err) => {
+            console.log(`🎯 EMİR -> ${veri.isim} | X:${veri.x}, Y:${veri.y}`);
+            arduinoPort.write(`${veri.x},${veri.y}\n`, (err) => {
                 if (err) {
                     console.log("Gönderim hatası:", err.message);
                     sonBaglantiDurumu = false;
