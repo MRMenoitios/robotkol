@@ -269,105 +269,8 @@
             border-left: none;
             border-top: none;
         }
-        /* Yan Ayar Paneli (Sol) */
-        #ayarPaneli {
-            position: absolute;
-            left: -300px; /* Başlangıçta gizli */
-            top: 100px;
-            width: 280px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--neon-green);
-            border-left: none;
-            border-radius: 0 15px 15px 0;
-            padding: 20px;
-            z-index: 20;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: white;
-            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
-        }
-
-        #ayarPaneli.acik { left: 0; }
-
-        .ayar-tetikleyici {
-            position: absolute;
-            right: -40px;
-            top: 20px;
-            width: 40px;
-            height: 40px;
-            background: var(--neon-green);
-            color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            border-radius: 0 5px 5px 0;
-            font-weight: bold;
-        }
-
-        .ayar-grubu { margin-bottom: 20px; }
-        .ayar-grubu h3 { 
-            font-size: 0.9rem; 
-            margin: 0 0 10px 0; 
-            color: var(--neon-blue); 
-            text-transform: uppercase;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
-            padding-bottom: 5px;
-        }
-
-        .slider-satir {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            margin-bottom: 10px;
-            font-size: 0.75rem;
-        }
-
-        input[type=range] {
-            width: 100%;
-            accent-color: var(--neon-green);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Yapay Zeka Modu Switch */
-        .switch-grubu {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: rgba(0, 255, 0, 0.05);
-            border-radius: 5px;
-            border: 1px solid rgba(0, 255, 0, 0.2);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-        }
-
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333; transition: .4s;
-            border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute; content: "";
-            height: 14px; width: 14px;
-            left: 3px; bottom: 3px;
-            background-color: white; transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--neon-blue); }
-        input:checked + .slider:before { transform: translateX(20px); }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Yapay Zeka Kütüphaneleri -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
     <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="sistemHazir();"></script>
     <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -388,46 +291,6 @@
         <div class="durum-grubu">
             <div id="fpsSayaci" style="font-size: 0.8rem; color: var(--neon-blue);">FPS: --</div>
             <div id="arduinoBaglanti" class="durum-rozeti kopuk">ARDUINO: OFFLINE</div>
-        </div>
-    </div>
-
-    <div id="ayarPaneli">
-        <div class="ayar-tetikleyici" onclick="document.getElementById('ayarPaneli').classList.toggle('acik')">⚙️</div>
-        
-        <div class="ayar-grubu">
-            <h3>🤖 Yapay Zeka Modu</h3>
-            <div class="switch-grubu">
-                <span>AI Nesne Tanıma</span>
-                <label class="switch">
-                    <input type="checkbox" id="aiModu">
-                    <span class="slider"></span>
-                </label>
-            </div>
-        </div>
-
-        <div class="ayar-grubu">
-            <h3>🎨 Renk Filtresi (HSV)</h3>
-            <div class="slider-satir">
-                <span>HUE (Renk) Min-Max: <b id="valH">0 - 180</b></span>
-                <input type="range" id="hMin" min="0" max="180" value="0">
-                <input type="range" id="hMax" min="0" max="180" value="180">
-            </div>
-            <div class="slider-satir">
-                <span>SAT (Dolgunluk) Min: <b id="valS">0</b></span>
-                <input type="range" id="sMin" min="0" max="255" value="0">
-            </div>
-            <div class="slider-satir">
-                <span>VAL (Parlaklık) Min: <b id="valV">200</b></span>
-                <input type="range" id="vMin" min="0" max="255" value="200">
-            </div>
-        </div>
-
-        <div class="ayar-grubu">
-            <h3>📏 Robot Kol (IK)</h3>
-            <div class="slider-satir">
-                <span>Uzanma Derinliği (Z): <b id="valZ">100</b></span>
-                <input type="range" id="zEkseni" min="0" max="200" value="100">
-            </div>
         </div>
     </div>
 
@@ -453,28 +316,8 @@
         const konsol = document.getElementById('konsol');
         const fpsSayaci = document.getElementById('fpsSayaci');
 
-        const hMin = document.getElementById('hMin'), hMax = document.getElementById('hMax');
-        const sMin = document.getElementById('sMin'), vMin = document.getElementById('vMin');
-        const zEkseni = document.getElementById('zEkseni'), aiModu = document.getElementById('aiModu');
-        
         let islemBasladi = false, anlikHedefler = [], seciliHedefKodu = null, bekleyenHedef = null;
-        let lastTime = 0, frameCount = 0, aiModel = null;
-
-        // AI Modelini Yükle
-        cocoSsd.load().then(model => {
-            aiModel = model;
-            logMesaj("Yapay Zeka (COCO-SSD) yüklendi.", "sistem");
-        });
-
-        // Slider değerlerini ekranda göster
-        [hMin, hMax, sMin, vMin, zEkseni].forEach(el => {
-            el.addEventListener('input', () => {
-                if(el.id.includes('h')) document.getElementById('valH').innerText = `${hMin.value} - ${hMax.value}`;
-                else if(el.id === 'sMin') document.getElementById('valS').innerText = sMin.value;
-                else if(el.id === 'vMin') document.getElementById('valV').innerText = vMin.value;
-                else if(el.id === 'zEkseni') document.getElementById('valZ').innerText = zEkseni.value;
-            });
-        });
+        let lastTime = 0, frameCount = 0;
 
         function logMesaj(mesaj, tip = 'sistem') {
             const div = document.createElement('div');
@@ -537,7 +380,7 @@
                     let merkezX = Math.round(h.x + (h.w / 2));
                     let merkezY = Math.round(h.y + (h.h / 2));
 
-                    bekleyenHedef = { isim: h.isim, x: merkezX, y: merkezY, z: zEkseni.value };
+                    bekleyenHedef = { isim: h.isim, x: merkezX, y: merkezY };
                     secimMetni.innerHTML = `<span class="bekliyor">HEDEF SEÇİLDİ: ${h.isim} [${merkezX}, ${merkezY}]</span>`;
                     logMesaj(`Hedef belirlendi: ${h.isim}`, "sistem");
                     butonlarDiv.style.display = 'flex';
@@ -549,7 +392,7 @@
         document.getElementById('btnOnay').addEventListener('click', () => {
             if (bekleyenHedef) {
                 secimMetni.innerHTML = `<span class="kilitli">ROBOT HAREKETTE: ${bekleyenHedef.isim}</span>`;
-                logMesaj(`Kilitlenme onaylandı! Z:${bekleyenHedef.z} derinliğine gidiliyor...`, "sistem");
+                logMesaj(`Kilitlenme onaylandı! Koordinatlara gidiliyor...`, "sistem");
                 butonlarDiv.style.display = 'none';
                 socket.emit('hedefKilitlendi', bekleyenHedef);
             }
@@ -562,7 +405,7 @@
             butonlarDiv.style.display = 'none';
         });
 
-        async function goruntuIsle(now) {
+        function goruntuIsle(now) {
             if (!islemBasladi) return;
 
             // FPS Hesaplama
@@ -581,34 +424,20 @@
                 let cap = new cv.VideoCapture(video);
 
                 cap.read(src);
-
-                // --- YAPAY ZEKA MODU ---
-                if (aiModu.checked && aiModel) {
-                    const predictions = await aiModel.detect(video);
-                    predictions.forEach(p => {
-                        let [x, y, w, h] = p.bbox;
-                        let renk = [0, 243, 255, 255];
-                        cv.rectangle(src, new cv.Point(x, y), new cv.Point(x + w, y + h), renk, 2);
-                        cv.putText(src, `${p.class} (${Math.round(p.score * 100)}%)`, new cv.Point(x, y - 5), cv.FONT_HERSHEY_SIMPLEX, 0.5, renk, 1);
-                        
-                        // AI nesnelerini hedef listesine ekle
-                        anlikHedefler.push({ id: p.class, isim: p.class, x, y, w, h });
-                    });
-                }
-
                 cv.cvtColor(src, hsv, cv.COLOR_RGBA2RGB);
                 cv.cvtColor(hsv, hsv, cv.COLOR_RGB2HSV);
 
-                // --- DİNAMİK RENK FİLTRESİ ---
-                let low = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [parseInt(hMin.value), parseInt(sMin.value), parseInt(vMin.value), 0]);
-                let high = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [parseInt(hMax.value), 255, 255, 0]);
-                let mask = new cv.Mat();
-                cv.inRange(hsv, low, high, mask);
+                let altBeyaz = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [0, 0, 200, 0]);
+                let ustBeyaz = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [180, 40, 255, 0]);
+                let maskeBeyaz = new cv.Mat();
+                cv.inRange(hsv, altBeyaz, ustBeyaz, maskeBeyaz);
 
-                if (!aiModu.checked) {
-                    anlikHedefler = [];
-                    sekilleriBulVeCiz(mask, "Hedef");
-                }
+                let altSiyah = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [0, 0, 0, 0]);
+                let ustSiyah = new cv.Mat(hsv.rows, hsv.cols, hsv.type(), [180, 255, 50, 0]);
+                let maskeSiyah = new cv.Mat();
+                cv.inRange(hsv, altSiyah, ustSiyah, maskeSiyah);
+
+                anlikHedefler = [];
 
                 function sekilleriBulVeCiz(maske, renkAdi) {
                     let kernel = cv.Mat.ones(5, 5, cv.CV_8U);
@@ -629,13 +458,13 @@
                             let poly = new cv.Mat();
                             cv.approxPolyDP(cnt, poly, 0.04 * cevre, true);
                             let koseSayisi = poly.rows;
+                            let kutu = cv.boundingRect(poly);
                             let sekilAdi = null;
 
                             if (dairesellik > 0.8) sekilAdi = "Daire";
                             else if (koseSayisi === 3) sekilAdi = "Ucgen";
                             else if (koseSayisi === 4) {
-                                let rect = cv.boundingRect(poly);
-                                let orant = rect.width / rect.height;
+                                let orant = kutu.width / kutu.height;
                                 sekilAdi = (orant >= 0.8 && orant <= 1.2) ? "Kare" : "Dikdortgen";
                             }
 
@@ -647,11 +476,14 @@
                                 let kalinlik = kilitliMi ? 2 : 1;
 
                                 if (sekilAdi === "Daire") {
+                                    // Daireler için tam çember çizimi
                                     let circle = cv.minEnclosingCircle(cnt);
                                     mX = Math.round(circle.center.x);
                                     mY = Math.round(circle.center.y);
-                                    cv.circle(src, new cv.Point(mX, mY), Math.round(circle.radius), renk, kalinlik);
+                                    let radius = Math.round(circle.radius);
+                                    cv.circle(src, new cv.Point(mX, mY), radius, renk, kalinlik);
                                 } else {
+                                    // Diğer şekiller için döndürülmüş dikdörtgen çizimi
                                     let rotatedRect = cv.minAreaRect(cnt);
                                     let vertices = cv.RotatedRect.points(rotatedRect);
                                     mX = Math.round(rotatedRect.center.x);
@@ -660,14 +492,24 @@
                                         cv.line(src, vertices[j], vertices[(j + 1) % 4], renk, kalinlik);
                                     }
                                 }
-                                
-                                anlikHedefler.push({ id: benzersizId, isim: renkAdi + " " + sekilAdi, x: mX - 20, y: mY - 20, w: 40, h: 40 });
-                                
+
+                                let tamIsim = renkAdi + " " + sekilAdi;
+                                anlikHedefler.push({
+                                    id: benzersizId,
+                                    isim: tamIsim,
+                                    x: mX - 20, y: mY - 20, w: 40, h: 40
+                                });
+
+                                // Hedef İşareti (Crosshair)
                                 let cSize = 8;
                                 cv.line(src, new cv.Point(mX - cSize, mY), new cv.Point(mX + cSize, mY), renk, 1);
                                 cv.line(src, new cv.Point(mX, mY - cSize), new cv.Point(mX, mY + cSize), renk, 1);
-                                if (kilitliMi) cv.circle(src, new cv.Point(mX, mY), 12, renk, 1);
-                                cv.putText(src, sekilAdi, new cv.Point(mX - 30, mY - 20), cv.FONT_HERSHEY_SIMPLEX, 0.4, renk, 1);
+
+                                if (kilitliMi) {
+                                    cv.circle(src, new cv.Point(mX, mY), 12, renk, 1);
+                                }
+
+                                cv.putText(src, tamIsim, new cv.Point(mX - 30, mY - 20), cv.FONT_HERSHEY_SIMPLEX, 0.4, renk, 1);
                             }
                             poly.delete();
                         }
@@ -675,9 +517,14 @@
                     contours.delete(); hierarchy.delete();
                 }
 
+                sekilleriBulVeCiz(maskeBeyaz, "Beyaz");
+                sekilleriBulVeCiz(maskeSiyah, "Siyah");
+
                 cv.imshow('cikisEkrani', src);
 
-                src.delete(); hsv.delete(); mask.delete(); low.delete(); high.delete();
+                src.delete(); hsv.delete();
+                maskeBeyaz.delete(); altBeyaz.delete(); ustBeyaz.delete();
+                maskeSiyah.delete(); altSiyah.delete(); ustSiyah.delete();
 
             } catch (err) { console.error(err); }
             requestAnimationFrame(goruntuIsle);
