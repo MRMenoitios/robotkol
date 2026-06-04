@@ -8,8 +8,13 @@ const portAdi = 'COM3'; // Kendi portuna göre ayarla
 
 const arduinoPort = new SerialPort({
     path: portAdi,
-    baudRate: 9600,
+    baudRate: 115200,
     autoOpen: false
+});
+
+// Arduino'dan gelen log ve hata mesajlarını sunucu terminaline yazdır
+arduinoPort.on('data', (data) => {
+    console.log(`🤖 ARDUINO -> ${data.toString().trim()}`);
 });
 
 // Port kapandığında tetiklenir (Kablo çekilmesi vb.)
@@ -69,14 +74,36 @@ setInterval(async () => {
 io.on('connection', (socket) => {
     socket.emit('arduinoDurum', sonBaglantiDurumu);
 
-    socket.on('hedefKilitlendi', (veri) => {
+    // Manuel kontrol verisini Arduino'ya gönder (Klavye veya Slider)
+    socket.on('manuelKontrol', (veri) => {
         if (sonBaglantiDurumu) {
-            console.log(`🎯 EMİR -> ${veri.isim} | X:${veri.x}, Y:${veri.y}`);
-            arduinoPort.write(`${veri.x},${veri.y}\n`, (err) => {
+            arduinoPort.write(`K,${veri.taban},${veri.omuz},${veri.dirsek},${veri.kiskac}\n`, (err) => {
                 if (err) {
-                    console.log("Gönderim hatası:", err.message);
-                    sonBaglantiDurumu = false;
-                    io.emit('arduinoDurum', false);
+                    console.log("Manuel kontrol gönderim hatası:", err.message);
+                }
+            });
+        }
+    });
+
+    // Geriye dönük uyumluluk için klavyeKontrol desteğini koru
+    socket.on('klavyeKontrol', (veri) => {
+        if (sonBaglantiDurumu) {
+            arduinoPort.write(`K,${veri.taban},${veri.omuz},${veri.dirsek},${veri.kiskac}\n`, (err) => {
+                if (err) {
+                    console.log("Klavye gönderim hatası:", err.message);
+                }
+            });
+        }
+    });
+
+    // Buzzer çalma emri gönder
+    socket.on('buzzerCal', (veri) => {
+        if (sonBaglantiDurumu) {
+            const frekans = veri.frekans || 1000;
+            const sure = veri.sure || 100;
+            arduinoPort.write(`B,${frekans},${sure}\n`, (err) => {
+                if (err) {
+                    console.log("Buzzer gönderim hatası:", err.message);
                 }
             });
         }
